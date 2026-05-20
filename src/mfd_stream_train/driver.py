@@ -3,12 +3,10 @@ from __future__ import annotations
 from .trainer import ExperimentConfig, run_experiment
 from src.mfd_stream_existing_iq.config import build_class_subset_tag
 
-PARENT_DIR = r"C:\Users\scocks\BitBucket\spectral_labs\GOOD-VERSION-MFD-NET\HPC-aimc-spec-v2 - data gen v2 - no noise in model\\"
+PARENT_DIR = r"C:\\Users\\scocks\\BitBucket\\spectral_labs\\mfd-net\\"
 
 def main():
-    # output_dir_parent = r"C:\Users\scocks\BitBucket\spec_labs_2\SL_mfd-net-v2-tests-22-03-2026\HPC-aimc-spec-v2 - data gen v2 - no noise in model\data_strong"
     output_dir_parent = PARENT_DIR + r"data"
-    # output_dir_parent = r"C:\Users\scocks\BitBucket\spec_labs_2\SL_mfd-net-v2-tests-22-03-2026\HPC-aimc-spec-v2 - data gen v2 - no noise in model\data_real"
 
     class_subset_names = (
         "unmodulated",
@@ -32,7 +30,7 @@ def main():
 
     noise_handling_mode="gap_noise_images" # pulse_tail_pad | gap_padding | gap_noise_images | gap_noise_embeddings
 
-    chunky = 64
+    chunky = 16 # 16 | 32 | 64 | Can be other numbers but going in factors of 2 is easier to see the effect. 
 
     cfg = ExperimentConfig(
         train_memmap_dir=output_dir_parent + r"/MFD_Net_train_stream_memmap",
@@ -47,16 +45,11 @@ def main():
         #   phase       -> phase_checkpoint
         #   power_phase -> power_checkpoint + phase_checkpoint
         #   dual        -> dual_checkpoint
-
-        # OG Ckpt
-        # phase_checkpoint=r"C:\Users\scocks\BitBucket\spec_labs_2\SL_mfd-net-v2-tests-22-03-2026\HPC-aimc-spec-v2 - data gen v2 - no noise in model\out\resnet_phase\20260403_234649_None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6\checkpoints\best__None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6.pt",
-        # power_checkpoint=r"C:\Users\scocks\BitBucket\spec_labs_2\SL_mfd-net-v2-tests-22-03-2026\HPC-aimc-spec-v2 - data gen v2 - no noise in model\out\resnet_power\20260403_234052_None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6\checkpoints\best__None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6.pt",
-        
-        # Real version ckpt
-        phase_checkpoint=PARENT_DIR + r"out\resnet_phase\20260417_115620_None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6\checkpoints\best__None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6.pt",
-        power_checkpoint=PARENT_DIR + r"out\resnet_power\20260417_121336_None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6\checkpoints\best__None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6.pt",
-        # Dual not retrained on the real version
-        dual_checkpoint=PARENT_DIR + r"out\resnet_dual\20260408_091805_None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6\checkpoints\best__None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6.pt",
+       
+        ### PATH TO UPDATE
+        phase_checkpoint=PARENT_DIR + r"",
+        power_checkpoint=PARENT_DIR + r"",
+        dual_checkpoint=PARENT_DIR + r"",
         train_noise_bank_dir=output_dir_parent + r"/MFD_Net_train_stream_noise_bank",
         val_noise_bank_dir=output_dir_parent + r"/MFD_Net_val_stream_noise_bank",
         test_noise_bank_dir=output_dir_parent + r"/MFD_Net_test_stream_noise_bank",
@@ -73,9 +66,7 @@ def main():
         val_pad_short_streams=True,
         batch_size=16,
         num_workers=0,
-        # max_epochs=25,
         max_epochs=50,
-        # patience=5,
         patience=10,
         min_delta=0.001,
         learning_rate=1e-4,
@@ -94,8 +85,6 @@ def main():
         dim_feedforward=512,
         dropout=0.1,
 
-        # use_frame_encoder_logits=True,
-        # add_aux_logit_token=True,
         use_frame_encoder_logits=False,
         add_aux_logit_token=False,
 

@@ -35,12 +35,6 @@ def run_experiment(model: nn.Module, ds_cfg: DatasetConfig, train_cfg: TrainConf
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     rng = np.random.default_rng(train_cfg.seed)
 
-    # OLD
-    # train_ds, train_loader, val_loaders_by_snr = build_loaders_memmap(
-    #     ds_cfg, train_cfg, rng
-    # )
-
-    # NEW
     train_ds, train_loader, val_loaders_by_snr, test_loaders_by_snr = build_loaders_memmap(ds_cfg, train_cfg, rng)
 
     class_count = len(train_ds.class_to_id)

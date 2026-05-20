@@ -25,6 +25,8 @@ from src.ResNet.ResNet import MainModel
 
 # ==========================================================#
 
+DATA_PATH = r"C:\Users\scocks\BitBucket\spectral_labs\mfd-net\data"
+
 
 def main():
     print("|=====| ResNet Single-Frame |=====|")
@@ -45,16 +47,17 @@ def main():
     ]
 
     # Choose one of: power | phase | dual
-    spectro = "power"
+    spectro = "phase"
 
     try:
         from src.mfd_stream_existing_iq.config import build_class_subset_tag
+
         subset_tag = build_class_subset_tag(modulation_list)
     except Exception:
         subset_tag = "__".join(sorted(modulation_list))
 
-    data_root_parent = r"C:\Users\scocks\BitBucket\spec_labs_2\SL_mfd-net-v2-tests-22-03-2026\HPC-aimc-spec-v2 - data gen v2 - no noise in model\data"
-    # data_root_parent = r"C:\Users\scocks\BitBucket\spec_labs_2\SL_mfd-net-v2-tests-22-03-2026\HPC-aimc-spec-v2 - data gen v2 - no noise in model\data_real"
+    data_root_parent = DATA_PATH
+
     data_path = os.path.join(data_root_parent, subset_tag, f"{spectro}_singleframe")
     print(f"[singleframe] spectro={spectro} | data_path={data_path}")
 
@@ -77,14 +80,13 @@ def main():
 
     model_name = f"resnet_{spectro}"
 
-
     train_cfg = TrainConfig(
         seed=42,
         max_epochs=50,
-        batch_size_train=32,  # was 32
-        batch_size_val=64,  # was 64 (bump if it fits)
-        learning_rate=6e-4,  # was 3e-4
-        patience=10,  # was 12
+        batch_size_train=32,
+        batch_size_val=64,
+        learning_rate=6e-4,
+        patience=10,
         min_delta=0.001,
         update_every=10,
         ema_alpha=0.1,

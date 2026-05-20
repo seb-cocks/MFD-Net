@@ -31,12 +31,14 @@ DEFAULT_MODULATION_LIST = (
     "barker_13",
     "polyphase",
 )
+
 MERGE_MAP = {"polyphase": ("p1", "p2", "p3", "p4")}
+
 SELECTED_MODULATION_LIST = DEFAULT_MODULATION_LIST
 
-VERSION = ""  # _real | *blank*
 DATA_SPLITS: tuple[str, ...] = ("train", "val", "test")
 
+DATA_PATH = r"C:\Users\scocks\BitBucket\spectral_labs\mfd-net\data"
 
 def _common_spectrogram() -> SpectrogramAdapterConfig:
     return SpectrogramAdapterConfig(
@@ -44,12 +46,6 @@ def _common_spectrogram() -> SpectrogramAdapterConfig:
         power_method_name="iq_to_power_spectrogram",
         phase_method_name="iq_to_phase_spectrogram",  # "iq_to_phase_edge_spectrogram" or "iq_to_phase_spectrogram"
         resize_method_name="resize_spec01_for_save",
-        # power_n_fft=64,
-        # power_win_len=32,
-        # power_hop_len=8,
-        # phase_n_fft=64,
-        # phase_win_len=32,
-        # phase_hop_len=8,
         #
         power_n_fft=256,
         power_win_len=64,
@@ -60,13 +56,11 @@ def _common_spectrogram() -> SpectrogramAdapterConfig:
         phase_hop_len=8,
         phase_power_gate_db=-12.0,
         phase_soft_gate_width_db=6.0,
-        # phase_power_gate_db=None,
         #
         out_height=224,
         out_width=224,
         context_samples_each_side=128,
     )
-
 
 def _common_scan() -> IQScanConfig:
     return IQScanConfig(
@@ -80,15 +74,12 @@ def _common_scan() -> IQScanConfig:
         balance_merged_groups=True,
     )
 
-
 def _common_stream() -> StreamBuildConfig:
     return StreamBuildConfig(
         sample_rate_hz=50e6,
         window_len=1000,
-        # window_count=32,
         window_count=128,
-        streams_per_class=-1,
-        # streams_per_class=100,
+        streams_per_class=-1, # Setting to -1 means all are used
         require_full_pulse_inside_stream=True,
         min_valid_windows_per_stream=1,
         use_recorded_pri=True,
@@ -109,7 +100,6 @@ def _common_stream() -> StreamBuildConfig:
         short_pulse_safe_margin_samples=20,
     )
 
-
 def _common_singleframe() -> SingleFrameBuildConfig:
     return SingleFrameBuildConfig(
         sample_rate_hz=50e6,
@@ -129,18 +119,17 @@ def _common_singleframe() -> SingleFrameBuildConfig:
         short_pulse_safe_margin_samples=20,
     )
 
-
-def build_default_driver_config() -> DriverConfig:
-    dual_resnet_ckpt = r"C:\Users\scocks\BitBucket\spec_labs_2\SL_mfd-net-v2-tests-22-03-2026\HPC-aimc-spec-v2 - data gen v2 - no noise in model\out\resnet_dual\20260403_165139_None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6\checkpoints\best__None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6.pt"
+def build_default_driver_config() -> DriverConfig:    
     common_spectrogram = _common_spectrogram()
     common_scan = _common_scan()
     common_stream = _common_stream()
 
-    # output_dir_parent = r"C:\Users\scocks\BitBucket\spec_labs_2\SL_mfd-net-v2-tests-22-03-2026\HPC-aimc-spec-v2 - data gen v2 - no noise in model\data"
-    output_dir_parent = r"C:\Users\scocks\BitBucket\spec_labs_2\SL_mfd-net-v2-tests-22-03-2026\HPC-aimc-spec-v2 - data gen v2 - no noise in model\data" + VERSION
+    ### PATH TO UPDATE 
+    ### **required
+    dual_resnet_ckpt = r"C:\Users\scocks\BitBucket\spectral_labs\mfd-net\out\resnet_dual\20260520_152902_None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6\checkpoints\best__None_singleframe_e50_wc1_h1_lr0.0006_snr630-3-6.pt"
 
-    input_dir = r"C:\Apps\Code\MFD_Net" + VERSION + "_"
-    # input_dir = r"C:\Apps\Code\MFD_Net_"
+    input_dir = DATA_PATH + r"\\iq\\MFD_Net" + "_"
+    output_dir_parent = DATA_PATH
 
     subset_root = build_class_subset_root(output_dir_parent, common_scan.modulation_list)
     subset_tag = build_class_subset_tag(common_scan.modulation_list)
@@ -194,17 +183,14 @@ def build_default_driver_config() -> DriverConfig:
         split_noise_banks=split_noise_banks,
     )
 
-
 def build_default_singleframe_export_configs() -> list[SingleFrameExportConfig]:
     common_scan = _common_scan()
     common_spectrogram = _common_spectrogram()
     common_single = _common_singleframe()
-    # output_dir_parent = r"C:\Users\scocks\BitBucket\spec_labs_2\SL_mfd-net-v2-tests-22-03-2026\HPC-aimc-spec-v2 - data gen v2 - no noise in model\data"
-    # output_dir_parent = r"C:\Users\scocks\BitBucket\spec_labs_2\SL_mfd-net-v2-tests-22-03-2026\HPC-aimc-spec-v2 - data gen v2 - no noise in model\data_strong"
-    output_dir_parent = r"C:\Users\scocks\BitBucket\spec_labs_2\SL_mfd-net-v2-tests-22-03-2026\HPC-aimc-spec-v2 - data gen v2 - no noise in model\data" + VERSION
-    input_dir = r"C:\Apps\Code\MFD_Net" + VERSION + "_"
-    # input_dir = r"C:\Apps\Code\MFD_Net_tiny_"
-    # input_dir = r"C:\Apps\Code\MFD_Net_"
+
+    input_dir = DATA_PATH + r"\\iq\\MFD_Net" + "_"
+    output_dir_parent = DATA_PATH
+    
     subset_root = build_class_subset_root(output_dir_parent, common_scan.modulation_list)
     cfgs: list[SingleFrameExportConfig] = []
     for mode in ("power", "phase", "dual"):
@@ -226,11 +212,10 @@ def build_default_singleframe_export_configs() -> list[SingleFrameExportConfig]:
             )
     return cfgs
 
-
 def main() -> None:
     build_stream_memmaps = True
     build_noise_banks = True
-    build_singleframe_memmaps = True
+    build_singleframe_memmaps = False
 
     if build_stream_memmaps or build_noise_banks:
         cfg = build_default_driver_config()
@@ -256,7 +241,6 @@ def main() -> None:
             print(f"BUILDING SINGLE-FRAME MEMMAP [{split_cfg.image_mode}] {split_cfg.split_name.upper()}")
             print("=" * 70)
             export_singleframe_memmap(split_cfg)
-
 
 if __name__ == "__main__":
     main()
